@@ -34,7 +34,7 @@ class MonitorTests(unittest.TestCase):
         counters = [{"Name": gpu["id"].upper() + "_phys_0", "DedicatedUsage": (i + 1) * 1024 ** 3}
                     for i, gpu in enumerate(gpus)]
         counters.append({"Name": "luid_0x00000000_0x99999999_phys_0", "DedicatedUsage": 123})
-        result = subprocess.CompletedProcess([], 0, stdout=json.dumps(counters))
+        result = subprocess.CompletedProcess([], 0, stdout=json.dumps({"memory": counters, "engines": []}))
         with patch.object(monitor, "IS_WINDOWS", True), patch.object(monitor, "windows_adapters", return_value=gpus), \
                 patch.object(monitor.subprocess, "run", return_value=result):
             data = monitor.collect_gpus()
@@ -52,6 +52,20 @@ class MonitorTests(unittest.TestCase):
         self.assertIsNone(actual[0]["used_bytes"])
         self.assertEqual(actual[0]["total_bytes"], 32 * 1024 ** 3)
         self.assertTrue(errors)
+
+    def test_processing_metrics(self):
+        gpus = [{"id": "luid_0x00000000_0x00000001"}, {"id": "luid_0x00000000_0x00000002"}]
+        counters = [{"Name": f"pid_{pid}_LUID_0x00000000_0x00000001_phys_0_eng_{engine}_engtype_Compute",
+                     "UtilizationPercentage": value}
+                    for pid, engine, value in [(1, 0, 30), (2, 0, 45), (1, 1, 20)]]
+        monitor.apply_windows_engines(gpus, counters)
+        self.assertEqual(gpus[0]["utilization_percent"], 75)
+        self.assertIsNone(gpus[1]["utilization_percent"])
+        self.assertEqual(monitor.parse_nvidia_csv("0, GPU-a, Test, 0, 100, 83")[0]["utilization_percent"], 83)
+        self.assertIsNone(monitor.parse_nvidia_csv("0, GPU-a, Test, 0, 100, [N/A]")[0]["utilization_percent"])
+        with patch.object(monitor.psutil, "cpu_percent", return_value=42), \
+                patch.object(monitor.shutil, "which", return_value=None), patch.object(monitor.Path, "glob", return_value=[]):
+            self.assertEqual(monitor.collect_gpus()["cpu"]["utilization_percent"], 42)
 
     def test_ram_uses_available_memory(self):
         ram = types.SimpleNamespace(total=32 * 1024 ** 3, available=20 * 1024 ** 3)
@@ -110,11 +124,12 @@ class MonitorTests(unittest.TestCase):
             device = card / "device"
             device.mkdir(parents=True)
             for name, value in {"vendor": "0x1002", "product_name": "AMD Test", "mem_info_vram_total": "8589934592",
-                                "mem_info_vram_used": "1073741824"}.items():
+                                "mem_info_vram_used": "1073741824", "gpu_busy_percent": "67"}.items():
                 (device / name).write_text(value)
             with patch.object(monitor.shutil, "which", return_value=None), patch.object(monitor.Path, "glob", return_value=[card]):
                 data = monitor.collect_gpus()
             self.assertEqual(data["gpus"][0]["name"], "AMD Test")
+            self.assertEqual(data["gpus"][0]["utilization_percent"], 67)
             self.assertEqual(data["gpus"][0]["used_bytes"], 1024 ** 3)
             self.assertEqual(data["errors"], [])
 

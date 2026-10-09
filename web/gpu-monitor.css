@@ -41,3 +41,7 @@
     #gpu-monitor-panel .gpu-monitor-fill { transition: none; }
 }
 
+
+#gpu-monitor-panel .gpu-monitor-interval { margin-top: 12px; padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, .14); }
+#gpu-monitor-panel .gpu-monitor-interval label { display: block; font-variant-numeric: tabular-nums; color: #bac3d2; }
+#gpu-monitor-panel .gpu-monitor-interval input { display: block; width: 100%; margin: 6px 0 0; accent-color: #66c9ac; cursor: pointer; }

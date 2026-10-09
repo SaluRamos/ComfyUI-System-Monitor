@@ -1,0 +1,43 @@
+#gpu-monitor-panel {
+    position: fixed;
+    z-index: 100;
+    width: 290px;
+    max-width: calc(100vw - 32px);
+    max-height: calc(100vh - 150px);
+    overflow: auto;
+    padding: 12px 14px;
+    border: 1px solid rgba(255, 255, 255, .14);
+    border-radius: 12px;
+    background: rgba(24, 27, 33, .95);
+    color: #edf0f5;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, .25);
+    font: 12px/1.5 system-ui, sans-serif;
+    box-sizing: border-box;
+}
+#gpu-monitor-panel[hidden], #gpu-monitor-panel [hidden] { display: none !important; }
+#gpu-monitor-panel[data-position="bottom-right"] { bottom: 20px; right: 20px; }
+#gpu-monitor-panel[data-position="bottom-left"] { bottom: 20px; left: 76px; }
+#gpu-monitor-panel[data-position="top-right"] { top: 100px; right: 20px; }
+#gpu-monitor-panel[data-position="top-left"] { top: 100px; left: 76px; }
+#gpu-monitor-panel .gpu-monitor-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+#gpu-monitor-panel .gpu-monitor-header strong { font-size: 12px; letter-spacing: .06em; }
+#gpu-monitor-panel button { background: transparent; color: #bac3d2; border: 0; border-radius: 4px; width: 24px; height: 24px; cursor: pointer; font: 18px system-ui; padding: 0; }
+#gpu-monitor-panel button:hover { background: #343b48; color: white; }
+#gpu-monitor-panel button:focus-visible { outline: 2px solid #79b7fc; }
+#gpu-monitor-panel .gpu-monitor-row { margin-top: 10px; }
+#gpu-monitor-panel .gpu-monitor-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #bac3d2; }
+#gpu-monitor-panel .gpu-monitor-memory { margin: 3px 0 6px; font-variant-numeric: tabular-nums; font-weight: 600; }
+#gpu-monitor-panel .gpu-monitor-track { height: 5px; border-radius: 4px; background: #343b48; overflow: hidden; }
+#gpu-monitor-panel .gpu-monitor-fill { height: 100%; background: #66c9ac; transition: width .3s; }
+#gpu-monitor-panel .gpu-monitor-fill[data-level="medium"] { background: #edbf68; }
+#gpu-monitor-panel .gpu-monitor-fill[data-level="high"] { background: #ec7e87; }
+#gpu-monitor-panel .gpu-monitor-status { margin-top: 8px; color: #edbf68; font-size: 11px; }
+#gpu-monitor-panel[data-stale="true"] .gpu-monitor-list { opacity: .5; }
+@media (max-width: 480px) {
+    #gpu-monitor-panel[data-position$="left"] { left: 16px; }
+    #gpu-monitor-panel { width: 250px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    #gpu-monitor-panel .gpu-monitor-fill { transition: none; }
+}
+

@@ -45,3 +45,8 @@
 #gpu-monitor-panel .gpu-monitor-interval { margin-top: 12px; padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, .14); }
 #gpu-monitor-panel .gpu-monitor-interval label { display: block; font-variant-numeric: tabular-nums; color: #bac3d2; }
 #gpu-monitor-panel .gpu-monitor-interval input { display: block; width: 100%; margin: 6px 0 0; accent-color: #66c9ac; cursor: pointer; }
+
+#gpu-monitor-panel .gpu-monitor-actions { margin-top: 12px; }
+#gpu-monitor-panel button.gpu-monitor-unload { width: 100%; height: auto; padding: 7px 10px; background: #343b48; font: 600 12px/1.5 system-ui, sans-serif; }
+#gpu-monitor-panel button.gpu-monitor-unload:hover { background: #465165; }
+#gpu-monitor-panel button.gpu-monitor-unload:disabled { opacity: .6; cursor: wait; }

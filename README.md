@@ -16,6 +16,8 @@ D:\new-comfyui\Intel2\ComfyUI\custom_nodes\ComfyUI-System-Monitor
 
 O painel aparece automaticamente no canto inferior esquerdo e atualiza a cada **2 segundos**. Use **− / +** para recolher ou expandir. Em **Configurações → GPU Monitor**, é possível ocultar o painel, escolher um dos quatro cantos e ajustar a atualização de **0,1 a 5 segundos**, em passos de 0,1 s. O slider na parte inferior do painel controla o mesmo ajuste e salva a preferência. O intervalo real depende também do tempo de consulta dos contadores do sistema.
 
+O botão **Unload all models**, acima do slider, solicita o descarregamento de todos os modelos e a limpeza do cache de execução pela API nativa `/free` do ComfyUI. Se um workflow estiver em execução, a liberação aguarda sua conclusão. Os modelos são carregados novamente quando necessários.
+
 Verde indica uso abaixo de 75%, amarelo a partir de 75% e vermelho a partir de 90%. Abas em segundo plano e o painel desativado suspendem novas consultas. Falhas de conexão deixam os últimos valores esmaecidos e mostram uma mensagem até a próxima leitura.
 
 ## GPUs e métricas
@@ -29,7 +31,7 @@ Verde indica uso abaixo de 75%, amarelo a partir de 75% e vermelho a partir de 9
 - No Linux, Intel depende dos mesmos contadores DRM; drivers que não os expõem não fornecem métricas. Apple Silicon não é monitorado. Memória compartilhada com a RAM não é somada à VRAM dedicada; GPUs integradas podem ter pouca ou nenhuma VRAM dedicada.
 - Os valores são os contadores de uso global do driver, incluindo outros programas, e não apenas memória alocada pelo PyTorch. Contadores indisponíveis aparecem como **—**, nunca como zero fictício. 1 GiB = 1024³ bytes.
 
-O monitor não inicializa contextos CUDA, não aloca tensores na GPU e não executa comandos para liberar VRAM. As consultas usam timeout, rodam fora do loop HTTP e compartilham um cache de 0,1 segundo entre clientes. Não acessa serviços externos, não envia telemetria e não baixa arquivos.
+O monitor não inicializa contextos CUDA, não aloca tensores na GPU e só solicita liberação de memória quando o botão **Unload all models** é acionado. As consultas usam timeout, rodam fora do loop HTTP e compartilham um cache de 0,1 segundo entre clientes. Não acessa serviços externos, não envia telemetria e não baixa arquivos.
 
 ## API e testes
 

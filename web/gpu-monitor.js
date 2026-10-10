@@ -169,7 +169,41 @@ app.registerExtension({
         });
         intervalControl.append(intervalLabel, intervalSlider);
         syncInterval();
-        panel.append(header, list, status, intervalControl);
+        const actions = document.createElement("div");
+        actions.className = "gpu-monitor-actions";
+        const unload = document.createElement("button");
+        unload.type = "button";
+        unload.className = "gpu-monitor-unload";
+        unload.textContent = "Unload all models";
+        unload.title = "Descarregar todos os modelos e liberar o cache. Aguarda o workflow atual terminar.";
+        const unloadStatus = document.createElement("div");
+        unloadStatus.className = "gpu-monitor-status";
+        unloadStatus.setAttribute("role", "status");
+        unloadStatus.hidden = true;
+        unload.addEventListener("click", async () => {
+            if (unload.disabled) return;
+            unload.disabled = true;
+            unload.textContent = "Solicitando…";
+            unloadStatus.hidden = true;
+            try {
+                const response = await api.fetchApi("/free", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ unload_models: true, free_memory: true }),
+                });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                unloadStatus.textContent = "Liberação solicitada. Se houver execução ativa, aguarda sua conclusão.";
+                refresh();
+            } catch (error) {
+                unloadStatus.textContent = "Falha ao solicitar liberação. Tente novamente.";
+            } finally {
+                unload.disabled = false;
+                unload.textContent = "Unload all models";
+                unloadStatus.hidden = false;
+            }
+        });
+        actions.append(unload, unloadStatus);
+        panel.append(header, list, status, actions, intervalControl);
         document.body.append(panel);
         for (const event of ["pointerdown", "pointerup", "wheel", "dblclick"]) {
             panel.addEventListener(event, (e) => e.stopPropagation());
